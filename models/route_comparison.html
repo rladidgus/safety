@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_ebba912576fddcfde52c57af7f5af70e {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+    <div style="position: fixed; bottom: 50px; left: 50px; z-index: 1000; background: white; padding: 10px; border-radius: 5px; box-shadow: 2px 2px 5px grey;">
+        <p><strong>경로 비교</strong></p>
+        <p><span style="color: blue;">━━</span> 최단 경로</p>
+        <p><span style="color: green;">━━</span> 안전 경로</p>
+    </div>
+    
+    
+            <div class="folium-map" id="map_ebba912576fddcfde52c57af7f5af70e" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_ebba912576fddcfde52c57af7f5af70e = L.map(
+                "map_ebba912576fddcfde52c57af7f5af70e",
+                {
+                    center: [37.503050991919196, 127.04395096767676],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 15,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_0eefa5b57c7735f7ce69449f152ae27a = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_0eefa5b57c7735f7ce69449f152ae27a.addTo(map_ebba912576fddcfde52c57af7f5af70e);
+        
+    
+            var poly_line_9b9eeead0bcd5dbdc40bdda629bb2352 = L.polyline(
+                [[37.4979234, 127.0277302], [37.4981, 127.0283071], [37.4981414, 127.0284387], [37.498225, 127.0287197], [37.4984367, 127.0294169], [37.4986872, 127.0302498], [37.4988829, 127.0308964], [37.4989338, 127.0310733], [37.499003, 127.0312957], [37.4992091, 127.0320017], [37.4994654, 127.0328273], [37.4995568, 127.033126], [37.4998173, 127.0339983], [37.5002757, 127.0355318], [37.5003255, 127.0356986], [37.5003987, 127.0359367], [37.5007244, 127.0362948], [37.5009049, 127.0369107], [37.5009911, 127.0371994], [37.5012434, 127.0380451], [37.5013407, 127.038371], [37.5015717, 127.0390986], [37.5017994, 127.039773], [37.5022297, 127.0411471], [37.5025244, 127.0420627], [37.5026051, 127.0423133], [37.502668, 127.0425089], [37.5027187, 127.0426671], [37.5027416, 127.0427558], [37.5027856, 127.0429259], [37.5029792, 127.043614], [37.503186, 127.0443191], [37.5035974, 127.0456262], [37.5040792, 127.0471884], [37.5046312, 127.0489627], [37.5051715, 127.0507387], [37.5058282, 127.0529047], [37.5064628, 127.0549768], [37.506787, 127.0560267], [37.5069402, 127.0565359], [37.5069844, 127.0566673], [37.5070114, 127.0567658], [37.5072284, 127.0574738], [37.5074164, 127.0580833], [37.5077642, 127.0591544], [37.5078464, 127.0593745], [37.5078999, 127.0595433], [37.5081968, 127.0604804], [37.5084991, 127.0614467], [37.5086519, 127.0619317], [37.5089497, 127.0629758]],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "blue", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 5}
+            ).addTo(map_ebba912576fddcfde52c57af7f5af70e);
+        
+    
+        var popup_5f7810ed7ba62ff0a204aad3d43832b3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b5cb7a907e72d0a73cdf6448ebdb6ca8 = $(`<div id="html_b5cb7a907e72d0a73cdf6448ebdb6ca8" style="width: 100.0%; height: 100.0%;">최단 경로: 3355m, 안전점수: 17.5</div>`)[0];
+                popup_5f7810ed7ba62ff0a204aad3d43832b3.setContent(html_b5cb7a907e72d0a73cdf6448ebdb6ca8);
+            
+        
+
+        poly_line_9b9eeead0bcd5dbdc40bdda629bb2352.bindPopup(popup_5f7810ed7ba62ff0a204aad3d43832b3)
+        ;
+
+        
+    
+    
+            var poly_line_e1024509f30c5a7de5b2d09f012871e5 = L.polyline(
+                [[37.4979234, 127.0277302], [37.4980478, 127.0276806], [37.4982952, 127.0284946], [37.4987176, 127.0298353], [37.4990249, 127.0308263], [37.4990814, 127.0310001], [37.4991493, 127.0312231], [37.4996292, 127.0327485], [37.49972, 127.0330459], [37.4999818, 127.0339114], [37.5002125, 127.0346502], [37.5004578, 127.0354358], [37.5005054, 127.0355884], [37.5007244, 127.0362948], [37.5009049, 127.0369107], [37.5009911, 127.0371994], [37.5012434, 127.0380451], [37.5013407, 127.038371], [37.5015717, 127.0390986], [37.5017994, 127.039773], [37.5022297, 127.0411471], [37.5025244, 127.0420627], [37.5026051, 127.0423133], [37.502668, 127.0425089], [37.5027187, 127.0426671], [37.5027416, 127.0427558], [37.5027856, 127.0429259], [37.5029792, 127.043614], [37.503186, 127.0443191], [37.5035974, 127.0456262], [37.5040792, 127.0471884], [37.5046312, 127.0489627], [37.5051715, 127.0507387], [37.5058282, 127.0529047], [37.5064628, 127.0549768], [37.506787, 127.0560267], [37.5069402, 127.0565359], [37.5069844, 127.0566673], [37.5070114, 127.0567658], [37.5072284, 127.0574738], [37.5074164, 127.0580833], [37.5077642, 127.0591544], [37.5078464, 127.0593745], [37.5078999, 127.0595433], [37.5081968, 127.0604804], [37.5084991, 127.0614467], [37.5086519, 127.0619317], [37.5089497, 127.0629758]],
+                {"bubblingMouseEvents": true, "color": "green", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "green", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 5}
+            ).addTo(map_ebba912576fddcfde52c57af7f5af70e);
+        
+    
+        var popup_85505b4f0c93edd5a9bf8f7768a6d470 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_81a4b54ed0c1a96ccf1e1638a74ab1d3 = $(`<div id="html_81a4b54ed0c1a96ccf1e1638a74ab1d3" style="width: 100.0%; height: 100.0%;">안전 경로: 3356m, 안전점수: 18.3</div>`)[0];
+                popup_85505b4f0c93edd5a9bf8f7768a6d470.setContent(html_81a4b54ed0c1a96ccf1e1638a74ab1d3);
+            
+        
+
+        poly_line_e1024509f30c5a7de5b2d09f012871e5.bindPopup(popup_85505b4f0c93edd5a9bf8f7768a6d470)
+        ;
+
+        
+    
+    
+            var marker_c8861a2c92d87061f964d780ea0bfdad = L.marker(
+                [37.4979234, 127.0277302],
+                {
+}
+            ).addTo(map_ebba912576fddcfde52c57af7f5af70e);
+        
+    
+            var icon_dc289c9cd5f8d50f6768d006dd5214f7 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "play",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_126ababc44037527ca390478fd09ef19 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_82f2f3b4155ee3a36e1c2da3b7deca74 = $(`<div id="html_82f2f3b4155ee3a36e1c2da3b7deca74" style="width: 100.0%; height: 100.0%;">출발</div>`)[0];
+                popup_126ababc44037527ca390478fd09ef19.setContent(html_82f2f3b4155ee3a36e1c2da3b7deca74);
+            
+        
+
+        marker_c8861a2c92d87061f964d780ea0bfdad.bindPopup(popup_126ababc44037527ca390478fd09ef19)
+        ;
+
+        
+    
+    
+                marker_c8861a2c92d87061f964d780ea0bfdad.setIcon(icon_dc289c9cd5f8d50f6768d006dd5214f7);
+            
+    
+            var marker_09103c374bba0e9fbff85bc43d4a75e7 = L.marker(
+                [37.5089497, 127.0629758],
+                {
+}
+            ).addTo(map_ebba912576fddcfde52c57af7f5af70e);
+        
+    
+            var icon_4e2c6923e46a4001cb476e8e380de207 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "stop",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_8712aa01b993bff315470a2792abc259 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_180e41a52c8bab6716fe9e770db9ece4 = $(`<div id="html_180e41a52c8bab6716fe9e770db9ece4" style="width: 100.0%; height: 100.0%;">도착</div>`)[0];
+                popup_8712aa01b993bff315470a2792abc259.setContent(html_180e41a52c8bab6716fe9e770db9ece4);
+            
+        
+
+        marker_09103c374bba0e9fbff85bc43d4a75e7.bindPopup(popup_8712aa01b993bff315470a2792abc259)
+        ;
+
+        
+    
+    
+                marker_09103c374bba0e9fbff85bc43d4a75e7.setIcon(icon_4e2c6923e46a4001cb476e8e380de207);
+            
+</script>
+</html>
