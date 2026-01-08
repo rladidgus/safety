@@ -19,6 +19,11 @@ joblib>=1.3.0
 # 공간 인덱싱
 scipy>=1.11.0
 
+# API 서버
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
+
 # 유틸리티
 tqdm>=4.66.0
 openpyxl>=3.1.0
