@@ -1,0 +1,389 @@
+:root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --primary-color: #2563eb;
+  /* Blue */
+  --primary-hover: #1d4ed8;
+  --success-color: #28a745;
+  --success-hover: #218838;
+  --bg-color: #f3f4f6;
+  --card-bg: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Main App Card */
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  /* Optional: might want 0 for full screen, but keeping rounded for 'phone frame' look */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Galaxy S20 Ultra Width */
+  width: 100%;
+  max-width: 412px;
+  /* Galaxy S20 Ultra Height */
+  height: 915px;
+  /* Galaxy S20 Ultra Height */
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ... existing styles ... */
+
+/* Login Page Specifics */
+.login-container-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f2f5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.login-container {
+  background: white;
+  padding: 40px;
+  /* Increased padding for larger screen */
+  border-radius: 20px;
+  /* Match card radius or use 0 if full screen feel intended */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 412px;
+  /* Galaxy S20 Ultra Width */
+  height: 915px;
+  /* Galaxy S20 Ultra Height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Center content vertically */
+}
+
+.header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.service-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.menu-button,
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.input-group {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.input-wrapper .icon {
+  margin-right: 10px;
+  color: var(--text-secondary);
+}
+
+.input-wrapper input {
+  border: none;
+  background: transparent;
+  flex-grow: 1;
+  font-size: 0.95rem;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.check-button {
+  background: #9ca3af;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.clear-button {
+  background: #9ca3af;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+
+.button-group {
+  padding: 0 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.map-placeholder-main {
+  height: 200px;
+  background: #e5e7eb;
+  margin: 0 20px 20px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.bottom-link {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.bottom-link a {
+  color: var(--text-secondary);
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+/* Result Page Specifics */
+.card.result-card {
+  max-width: 800px;
+  /* Widen the card for better map view */
+  width: 90vw;
+}
+
+.header-simple {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-simple .title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.map-area-result {
+  flex: 1;
+  height: 400px;
+  /* Taller for map */
+  width: 100%;
+  background: #e5e7eb;
+  position: relative;
+}
+
+.info-card {
+  padding: 14px 16px;
+  background: white;
+  margin: -12px 0 0 0;
+  /* Overlap map slightly if we want, or just verify layout */
+  z-index: 10;
+  border-radius: 20px 20px 0 0;
+  position: relative;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.bullet {
+  margin: 0 8px;
+  color: var(--text-secondary);
+}
+
+.safe-badge-row {
+  margin-bottom: 0px;
+}
+
+.safe-badge {
+  color: #059669;
+  /* Green-600 */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bottom-actions {
+  padding: 20px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn.small {
+  font-size: 0.95rem;
+  padding: 10px;
+}
+
+/* Login Page Specifics */
+.login-container-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f0f2f5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.login-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 412px;
+  height: 915px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Center content vertically instead of margin-top */
+}
+
+.login-container h2 {
+  margin-top: 0;
+  margin-bottom: 40px;
+  text-align: center;
+  color: #333;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.login-container button:hover {
+  background-color: #0056b3;
+}
+
+.login-container button.btn-success {
+  background-color: var(--success-color);
+}
+
+.login-container button.btn-success:hover {
+  background-color: var(--success-hover);
+}
+
+.login-container .link-text {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.login-container .link-text a {
+  color: #007bff;
+  text-decoration: none;
+}
