@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ 안심 길 안내</title>
+
+    <!-- Kakao Map SDK -->
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=cbfe84d814e1b43c96395c085b0dc363"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .time-info {
+            display: inline-block;
+            background: rgba(0, 217, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 20px;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d9ff;
+            font-weight: 600;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        input::placeholder {
+            color: #888;
+        }
+
+        input:focus {
+            outline: 2px solid #00d9ff;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border: 1px solid #00d9ff;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-results.show {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0, 217, 255, 0.2);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .coord-display {
+            font-size: 11px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-preset {
+            padding: 8px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .btn-preset:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .results {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .result-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .result-card.shortest h4 {
+            color: #3b82f6;
+        }
+
+        .result-card.safest h4 {
+            color: #22c55e;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 11px;
+        }
+
+        .comparison {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .comparison h4 {
+            color: #00d9ff;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .map-container {
+            border-radius: 15px;
+            overflow: hidden;
+            height: 600px;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .legend {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+        }
+
+        .legend-line {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-line.shortest {
+            background: #3b82f6;
+        }
+
+        .legend-line.safest {
+            background: #22c55e;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d9ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+            font-size: 13px;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .map-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ 안심 길 안내</h1>
+            <p>AI 기반 안전 경로 추천 서비스</p>
+            <div class="time-info" id="time-info">
+                ⏰ 현재 시간: --:-- (가로등: --)
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="form-group">
+                    <label>📍 출발지</label>
+                    <div class="search-container">
+                        <input type="text" id="start-search" placeholder="출발지 검색 (예: 서울역, 강남역)" autocomplete="off">
+                        <div class="search-results" id="start-results"></div>
+                    </div>
+                    <div class="coord-display" id="start-coord">좌표: -</div>
+                </div>
+
+                <div class="form-group">
+                    <label>🏁 목적지</label>
+                    <div class="search-container">
+                        <input type="text" id="end-search" placeholder="목적지 검색 (예: 명동, 홍대입구역)" autocomplete="off">
+                        <div class="search-results" id="end-results"></div>
+                    </div>
+                    <div class="coord-display" id="end-coord">좌표: -</div>
+                </div>
+
+                <div class="preset-buttons">
+                    <button class="btn btn-preset" onclick="setPreset('seoul-city')">서울역→시청</button>
+                    <button class="btn btn-preset" onclick="setPreset('gangnam')">강남역→삼성역</button>
+                    <button class="btn btn-preset" onclick="setPreset('jongno')">종로→동대문</button>
+                    <button class="btn btn-preset" onclick="setPreset('hongdae')">홍대→신촌</button>
+                </div>
+
+                <button class="btn btn-primary" id="search-btn" onclick="searchRoute()">
+                    🔍 경로 검색
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>경로 탐색 중...</p>
+                </div>
+
+                <div class="error" id="error">
+                    <strong>⚠️ 오류</strong>
+                    <p id="error-message"></p>
+                </div>
+
+                <div class="results" id="results">
+                    <div class="result-card shortest">
+                        <h4>🔵 최단 경로</h4>
+                        <div class="result-stats">
+                            <div class="stat">
+                                <div class="stat-value" id="shortest-distance">-</div>
+                                <div class="stat-label">거리</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value" id="shortest-safety">-</div>
+                                <div class="stat-label">안전점수</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-card safest">
+                        <h4>🟢 안전 경로</h4>
+                        <div class="result-stats">
+                            <div class="stat">
+                                <div class="stat-value" id="safest-distance">-</div>
+                                <div class="stat-label">거리</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value" id="safest-safety">-</div>
+                                <div class="stat-label">안전점수</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison">
+                        <h4>📊 비교</h4>
+                        <p><span id="length-diff">-</span> 더 걸어서 <span id="safety-diff">-</span> 더 안전</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+        // 선택된 좌표
+        let startCoord = null;
+        let endCoord = null;
+
+        // 카카오맵 초기화
+        const mapContainer = document.getElementById('map');
+        const mapOptions = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 5
+        };
+        const map = new kakao.maps.Map(mapContainer, mapOptions);
+
+        // 지도 컨트롤 추가
+        const zoomControl = new kakao.maps.ZoomControl();
+        map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+        // 마커 및 폴리라인 저장
+        let markers = [];
+        let shortestPolyline = null;
+        let safestPolyline = null;
+
+        // 범례 추가
+        function addLegend() {
+            const legendDiv = document.createElement('div');
+            legendDiv.className = 'legend';
+            legendDiv.innerHTML = `
+                <div class="legend-item">
+                    <div class="legend-line shortest"></div>
+                    <span>최단 경로</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line safest"></div>
+                    <span>안전 경로</span>
+                </div>
+            `;
+            legendDiv.style.position = 'absolute';
+            legendDiv.style.bottom = '10px';
+            legendDiv.style.right = '10px';
+            legendDiv.style.zIndex = '10';
+            mapContainer.appendChild(legendDiv);
+        }
+        addLegend();
+
+        // 현재 시간 표시
+        function updateTimeInfo() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const streetlightOn = hour >= 18 || hour < 6;
+            document.getElementById('time-info').textContent =
+                `⏰ 현재 시간: ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} (가로등: ${streetlightOn ? 'ON 🌙' : 'OFF ☀️'})`;
+        }
+        updateTimeInfo();
+        setInterval(updateTimeInfo, 60000);
+
+        // 프리셋
+        const presets = {
+            'seoul-city': {
+                start: { name: '서울역', lat: 37.5546, lon: 126.9706 },
+                end: { name: '시청', lat: 37.5665, lon: 126.9780 }
+            },
+            'gangnam': {
+                start: { name: '강남역', lat: 37.4979, lon: 127.0276 },
+                end: { name: '삼성역', lat: 37.5089, lon: 127.0631 }
+            },
+            'jongno': {
+                start: { name: '종로', lat: 37.5700, lon: 126.9830 },
+                end: { name: '동대문', lat: 37.5711, lon: 127.0095 }
+            },
+            'hongdae': {
+                start: { name: '홍대입구', lat: 37.5563, lon: 126.9237 },
+                end: { name: '신촌', lat: 37.5597, lon: 126.9427 }
+            }
+        };
+
+        function setPreset(name) {
+            const preset = presets[name];
+            document.getElementById('start-search').value = preset.start.name;
+            document.getElementById('end-search').value = preset.end.name;
+            startCoord = { lat: preset.start.lat, lon: preset.start.lon };
+            endCoord = { lat: preset.end.lat, lon: preset.end.lon };
+            document.getElementById('start-coord').textContent = `좌표: ${preset.start.lat.toFixed(4)}, ${preset.start.lon.toFixed(4)}`;
+            document.getElementById('end-coord').textContent = `좌표: ${preset.end.lat.toFixed(4)}, ${preset.end.lon.toFixed(4)}`;
+
+            // 마커 표시
+            clearMarkers();
+            addMarker(preset.start.lat, preset.start.lon, '출발', '#22c55e');
+            addMarker(preset.end.lat, preset.end.lon, '도착', '#ef4444');
+
+            // 지도 범위 조정
+            const bounds = new kakao.maps.LatLngBounds();
+            bounds.extend(new kakao.maps.LatLng(preset.start.lat, preset.start.lon));
+            bounds.extend(new kakao.maps.LatLng(preset.end.lat, preset.end.lon));
+            map.setBounds(bounds);
+        }
+
+        // 마커 관련 함수
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        function addMarker(lat, lon, text, color) {
+            const content = `<div style="background:${color};color:white;padding:5px 10px;border-radius:20px;font-weight:bold;font-size:12px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${text}</div>`;
+
+            const customOverlay = new kakao.maps.CustomOverlay({
+                position: new kakao.maps.LatLng(lat, lon),
+                content: content,
+                yAnchor: 1.5
+            });
+            customOverlay.setMap(map);
+            markers.push(customOverlay);
+        }
+
+        // 위치 검색 (Nominatim)
+        let searchTimeout = null;
+
+        async function searchLocation(query, resultsId) {
+            if (query.length < 2) {
+                document.getElementById(resultsId).classList.remove('show');
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${NOMINATIM_URL}?format=json&q=${encodeURIComponent(query + ', Seoul, South Korea')}&limit=5`,
+                    { headers: { 'Accept-Language': 'ko' } }
+                );
+                const results = await response.json();
+
+                const resultsDiv = document.getElementById(resultsId);
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<div class="search-result-item">검색 결과 없음</div>';
+                } else {
+                    resultsDiv.innerHTML = results.map(r => `
+                        <div class="search-result-item" 
+                             onclick="selectLocation('${resultsId}', '${r.display_name.split(',')[0]}', ${r.lat}, ${r.lon})">
+                            ${r.display_name.split(',').slice(0, 2).join(', ')}
+                        </div>
+                    `).join('');
+                }
+                resultsDiv.classList.add('show');
+            } catch (e) {
+                console.error('검색 오류:', e);
+            }
+        }
+
+        function selectLocation(resultsId, name, lat, lon) {
+            const isStart = resultsId === 'start-results';
+            const inputId = isStart ? 'start-search' : 'end-search';
+            const coordId = isStart ? 'start-coord' : 'end-coord';
+
+            document.getElementById(inputId).value = name;
+            document.getElementById(coordId).textContent = `좌표: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lon).toFixed(4)}`;
+            document.getElementById(resultsId).classList.remove('show');
+
+            if (isStart) {
+                startCoord = { lat: parseFloat(lat), lon: parseFloat(lon) };
+            } else {
+                endCoord = { lat: parseFloat(lat), lon: parseFloat(lon) };
+            }
+
+            // 마커 업데이트
+            clearMarkers();
+            if (startCoord) {
+                addMarker(startCoord.lat, startCoord.lon, '출발', '#22c55e');
+            }
+            if (endCoord) {
+                addMarker(endCoord.lat, endCoord.lon, '도착', '#ef4444');
+            }
+
+            // 지도 이동
+            if (startCoord && endCoord) {
+                const bounds = new kakao.maps.LatLngBounds();
+                bounds.extend(new kakao.maps.LatLng(startCoord.lat, startCoord.lon));
+                bounds.extend(new kakao.maps.LatLng(endCoord.lat, endCoord.lon));
+                map.setBounds(bounds);
+            } else {
+                const center = startCoord || endCoord;
+                map.setCenter(new kakao.maps.LatLng(center.lat, center.lon));
+                map.setLevel(3);
+            }
+        }
+
+        // 검색 입력 이벤트
+        document.getElementById('start-search').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => searchLocation(e.target.value, 'start-results'), 500);
+        });
+
+        document.getElementById('end-search').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => searchLocation(e.target.value, 'end-results'), 500);
+        });
+
+        // 검색창 외부 클릭 시 결과 숨김
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                document.querySelectorAll('.search-results').forEach(el => el.classList.remove('show'));
+            }
+        });
+
+        // 폴리라인 클리어
+        function clearPolylines() {
+            if (shortestPolyline) {
+                shortestPolyline.setMap(null);
+                shortestPolyline = null;
+            }
+            if (safestPolyline) {
+                safestPolyline.setMap(null);
+                safestPolyline = null;
+            }
+        }
+
+        // 경로 검색
+        async function searchRoute() {
+            if (!startCoord || !endCoord) {
+                alert('출발지와 목적지를 선택해주세요.');
+                return;
+            }
+
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('search-btn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/route`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        start_lat: startCoord.lat,
+                        start_lon: startCoord.lon,
+                        end_lat: endCoord.lat,
+                        end_lon: endCoord.lon
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '경로를 찾을 수 없습니다.');
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                document.getElementById('error-message').textContent = error.message;
+                document.getElementById('error').classList.add('show');
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('search-btn').disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('shortest-distance').textContent = `${Math.round(data.shortest.length)}m`;
+            document.getElementById('shortest-safety').textContent = `${data.shortest.safety_score}점`;
+            document.getElementById('safest-distance').textContent = `${Math.round(data.safest.length)}m`;
+            document.getElementById('safest-safety').textContent = `${data.safest.safety_score}점`;
+            document.getElementById('length-diff').textContent = `${Math.round(data.length_difference)}m`;
+            document.getElementById('safety-diff').textContent = `${data.safety_improvement}점`;
+
+            document.getElementById('results').classList.add('show');
+
+            // 기존 폴리라인 및 마커 제거
+            clearPolylines();
+            clearMarkers();
+
+            // 최단 경로 폴리라인 (파란색 점선)
+            const shortestPath = data.shortest.path_coords.map(coord =>
+                new kakao.maps.LatLng(coord[0], coord[1])
+            );
+            shortestPolyline = new kakao.maps.Polyline({
+                path: shortestPath,
+                strokeWeight: 5,
+                strokeColor: '#3b82f6',
+                strokeOpacity: 0.7,
+                strokeStyle: 'shortdash'
+            });
+            shortestPolyline.setMap(map);
+
+            // 안전 경로 폴리라인 (녹색 실선)
+            const safestPath = data.safest.path_coords.map(coord =>
+                new kakao.maps.LatLng(coord[0], coord[1])
+            );
+            safestPolyline = new kakao.maps.Polyline({
+                path: safestPath,
+                strokeWeight: 6,
+                strokeColor: '#22c55e',
+                strokeOpacity: 0.8,
+                strokeStyle: 'solid'
+            });
+            safestPolyline.setMap(map);
+
+            // 출발/도착 마커
+            const startCoordPath = data.shortest.path_coords[0];
+            const endCoordPath = data.shortest.path_coords[data.shortest.path_coords.length - 1];
+            addMarker(startCoordPath[0], startCoordPath[1], '출발', '#22c55e');
+            addMarker(endCoordPath[0], endCoordPath[1], '도착', '#ef4444');
+
+            // 지도 범위 조정
+            const bounds = new kakao.maps.LatLngBounds();
+            shortestPath.forEach(latlng => bounds.extend(latlng));
+            safestPath.forEach(latlng => bounds.extend(latlng));
+            map.setBounds(bounds);
+        }
+    </script>
+</body>
+
+</html>
