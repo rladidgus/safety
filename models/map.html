@@ -14,11 +14,110 @@
             width: 100%;
             height: 100vh;
         }
+        /* Chat UI Styles */
+        #chat-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 15px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 16px;
+        }
+        #chat-container {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            z-index: 1000;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #chat-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .user-msg {
+            align-self: flex-end;
+            background: #007bff;
+            color: white;
+        }
+        .bot-msg {
+            align-self: flex-start;
+            background: #e9ecef;
+            color: black;
+        }
+        #chat-input-area {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        #chat-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
     <div id="map"></div>
+
+    <!-- Chat Widget -->
+    <button id="chat-btn" onclick="toggleChat()">💬 안전 도우미</button>
+    <div id="chat-container">
+        <div id="chat-header">
+            <span>안전 지킴이 챗봇</span>
+            <button onclick="toggleChat()" style="background:none;border:none;color:white;cursor:pointer;">✕</button>
+        </div>
+        <div id="chat-messages">
+            <div class="message bot-msg">안녕하세요! 안전한 귀갓길이나 위험 지역에 대해 물어보세요.</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
+            <button id="send-btn" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
 
     <script>
         // 1. 기본 지도 (서울 중심)
@@ -108,6 +207,64 @@
             .catch((err) => {
                 console.error("포인트 불러오기 오류:", err);
             });
+        // Chat Functions
+        function toggleChat() {
+            const chatBox = document.getElementById("chat-container");
+            chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === "Enter") sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("chat-input");
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            // Add user message
+            addMessage(msg, "user-msg");
+            input.value = "";
+
+            try {
+                // Determine map center as context (optional, simplified for now)
+                const center = map.getCenter();
+                
+                const response = await fetch("http://127.0.0.1:8000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        message: msg,
+                        start_coords: [center.lng, center.lat], // Context example
+                        end_coords: [center.lng + 0.01, center.lat + 0.01] // Dummy end for context
+                    })
+                });
+
+                const data = await response.json();
+                addMessage(data.response, "bot-msg");
+
+                // Execute action if provided
+                if (data.intent === "route_recommendation" && data.data && data.data.route_geojson) {
+                    L.geoJSON(data.data.route_geojson, {
+                        style: { color: "#00FF00", weight: 5, opacity: 0.8 }
+                    }).addTo(map);
+                }
+
+            } catch (err) {
+                console.error(err);
+                addMessage("오류가 발생했습니다. 잠시 후 다시 시도해주세요.", "bot-msg");
+            }
+        }
+
+        function addMessage(text, className) {
+            const div = document.createElement("div");
+            div.className = `message ${className}`;
+            div.textContent = text;
+            document.getElementById("chat-messages").appendChild(div);
+            // Scroll to bottom
+            const container = document.getElementById("chat-messages");
+            container.scrollTop = container.scrollHeight;
+        }
     </script>
 </body>
 

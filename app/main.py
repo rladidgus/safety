@@ -4,7 +4,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 
+from app.chat import router as chat_router
+from app.db import init_db
+
 app = FastAPI()
+
+# --- DB 초기화 ---
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+# --- 라우터 등록 ---
+app.include_router(chat_router)
 
 # --- CORS 허용 ---
 app.add_middleware(
