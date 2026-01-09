@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
+import ChatWidget from '../components/ChatWidget';
 
 // --- Custom Icons ---
 const cctvIcon = L.icon({
@@ -46,9 +47,11 @@ const clusterStyles = `
         border: 2px solid white;
         box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
-    .marker-cluster-cctv { background-color: rgba(59, 130, 246, 0.8); }
-    .marker-cluster-street { background-color: rgba(234, 179, 8, 0.85); }
-    .marker-cluster-ent { background-color: rgba(239, 68, 68, 0.85); }
+    .marker-cluster-cctv { background-color: rgba(59, 130, 246, 0.66); }
+    .marker-cluster-street { background-color: rgba(234, 179, 8, 0.66); }
+    .marker-cluster-ent { background-color: rgba(239, 68, 68, 0.66); }
+    .marker-cluster-poli { background-color: rgba(255, 255, 255, 0.66); }
+    .marker-cluster-conv { background-color: rgba(52, 199, 89, 0.66); }
     .custom-cluster-icon div {
         width: 36px; height: 36px; margin: 0;
         text-align: center; border-radius: 50%;
@@ -170,8 +173,8 @@ const ResultPage = () => {
         const cctvCluster = createColoredCluster('marker-cluster-cctv');
         const streetCluster = createColoredCluster('marker-cluster-street');
         const entCluster = createColoredCluster('marker-cluster-ent');
-        const policeCluster = L.markerClusterGroup();
-        const convCluster = L.markerClusterGroup();
+        const policeCluster = L.markerClusterGroup('marker-cluster-poli');
+        const convCluster = createColoredCluster('marker-cluster-conv');
 
         // 포인트 데이터 추가
         if (points.length > 0) {
@@ -206,8 +209,8 @@ const ResultPage = () => {
         const overlays = {
             "CCTV (파랑)": cctvCluster,
             "가로등 (노랑)": streetCluster,
-            "경찰서": policeCluster,
-            "편의점": convCluster,
+            "경찰서 (보라)": policeCluster,
+            "편의점 (초록)": convCluster,
             "유흥업소 (빨강)": entCluster,
             "범죄주의구간(WMS)": wmsLayer
         };
@@ -372,6 +375,28 @@ const ResultPage = () => {
                     <button className="btn btn-primary small">길안내 시작</button>
                 </div>
             </div>
+
+            {/* Chatbot Widget */}
+            <ChatWidget
+                currentLat={startCoord?.lat || 37.5665}
+                currentLng={startCoord?.lon || 126.9780}
+                onMoveTo={(lat, lng) => {
+                    if (mapInstanceRef.current) {
+                        mapInstanceRef.current.setView([lat, lng], 16);
+                    }
+                }}
+                onDrawRoute={(routeData) => {
+                    if (mapInstanceRef.current && routeData?.coordinates) {
+                        const coords = routeData.coordinates.map(c => [c[1], c[0]]);
+                        L.polyline(coords, {
+                            color: '#ff6b6b',
+                            weight: 5,
+                            opacity: 0.8
+                        }).addTo(mapInstanceRef.current);
+                        mapInstanceRef.current.fitBounds(coords, { padding: [50, 50] });
+                    }
+                }}
+            />
         </div>
     );
 };

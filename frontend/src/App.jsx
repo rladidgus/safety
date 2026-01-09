@@ -3,7 +3,6 @@ import MainPage from './pages/MainPage';
 import ResultPage from './pages/ResultPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import RouteComparePage from './pages/RouteComparePage';
 
 function App() {
   return (
@@ -13,7 +12,6 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/main" element={<MainPage />} />
         <Route path="/result" element={<ResultPage />} />
-        <Route path="/compare" element={<RouteComparePage />} />
       </Routes>
     </BrowserRouter>
   );

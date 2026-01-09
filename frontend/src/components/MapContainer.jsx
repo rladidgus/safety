@@ -90,6 +90,12 @@ const clusterStyles = `
     .marker-cluster-ent {
         background-color: rgba(239, 68, 68, 0.85); /* Red */
     }
+    .marker-cluster-poli {
+        background-color: rgba(197, 10, 197, 0.85); /* Purple */
+    }
+    .marker-cluster-conv {
+        background-color: rgba(52, 199, 89, 0.85); /* Green */
+    }
     /* Default Overrides */
     .custom-cluster-icon div {
         width: 36px;
@@ -167,10 +173,8 @@ const MapContainer = ({ routeData }) => {
     const cctvCluster = createColoredCluster('marker-cluster-cctv');
     const streetCluster = createColoredCluster('marker-cluster-street');
     const entCluster = createColoredCluster('marker-cluster-ent');
-
-    // Standard Clusters for others
-    const policeCluster = L.markerClusterGroup();
-    const convCluster = L.markerClusterGroup();
+    const policeCluster = createColoredCluster('marker-cluster-poli');
+    const convCluster = createColoredCluster('marker-cluster-conv');
 
     // Populate Clusters
     if (points.length > 0) {

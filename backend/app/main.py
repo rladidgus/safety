@@ -143,6 +143,7 @@ origins = [
 # Import safety modules
 from .graph_builder import load_graph, build_weighted_graph_ml
 from .route_finder import find_safest_path, find_shortest_path, compare_routes, get_path_coords
+from .chatbot import router as chatbot_router
 
 app.add_middleware(
     CORSMiddleware,
@@ -151,6 +152,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Chatbot Router
+app.include_router(chatbot_router, tags=["chatbot"])
 
 @app.on_event("startup")
 async def startup_event():
@@ -379,6 +383,7 @@ def get_all_points():
     all_points.extend(load_facility_features("streetlights.csv", "streetlight"))
     all_points.extend(load_facility_features("convenience_stores.csv", "convenience"))
     all_points.extend(load_facility_features("entertainment_danger.csv", "entertainment"))
+    all_points.extend(load_facility_features("police_stations.csv", "police"))
     
     logger.info(f"Returning {len(all_points)} features for map")
     return {"points": all_points}

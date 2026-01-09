@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chatbot UI</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        /* 채팅 버튼 (Floating Action Button) */
+        #chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #chat-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 채팅 창 크기 및 위치 */
+        #chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* 채팅 헤더 */
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-chat {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* 채팅 메시지 영역 */
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background-color: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+
+        /* 입력 영역 */
+        .chat-input-area {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            background-color: white;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        #send-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #send-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 추천 질문 칩 */
+        .suggestions {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            overflow-x: auto;
+            white-space: nowrap;
+            background-color: #f1f1f1;
+            border-top: 1px solid #ddd;
+        }
+
+        .chip {
+            background-color: #fff;
+            border: 1px solid #007bff;
+            color: #007bff;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* 입력 중 표시 (Typing Indicator) */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 15px;
+            border-bottom-left-radius: 2px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 3px;
+            background-color: #555;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 채팅 버튼 -->
+    <button id="chat-btn" onclick="toggleChat()">💬</button>
+
+    <!-- 채팅 창 -->
+    <div id="chat-window">
+        <div class="chat-header">
+            <span>안심 길 안내 도우미</span>
+            <span class="close-chat" onclick="toggleChat()">×</span>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">안녕하세요! 현재 위치의 안전 정보가 궁금하시면 물어봐주세요.</div>
+            <!-- 입력 중 표시 -->
+            <div class="typing-indicator" id="typing-indicator">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </div>
+        </div>
+
+        <!-- 추천 질문 -->
+        <div class="suggestions">
+            <div class="chip" onclick="sendSuggestion('위험 지역 알려줘')">위험 지역 알려줘</div>
+            <div class="chip" onclick="sendSuggestion('주변 안전 시설 알려줘')">주변 안전 시설 알려줘</div>
+            <div class="chip" onclick="sendSuggestion('가장 가까운 CCTV 어디야?')">가장 가까운 CCTV 어디야?</div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..."
+                onkeypress="if(event.key==='Enter') sendMessage()" />
+            <button id="send-btn" onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 채팅 관련 스크립트 ---
+        function toggleChat() {
+            const chatWindow = document.getElementById("chat-window");
+            if (chatWindow.style.display === "none" || chatWindow.style.display === "") {
+                chatWindow.style.display = "flex";
+            } else {
+                chatWindow.style.display = "none";
+            }
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById("chat-input");
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            // 1. 사용자 메시지 화면에 추가
+            addMessage(message, "user");
+            inputField.value = "";
+
+            // 2. 현재 지도 중심 좌표 (부모 창과의 통신 또는 기본값 사용)
+            // 독립 실행 시 기본값 또는 부모 창에서 받아와야 하지만 일단 기본값 설정
+            // 실제 통합 시 window.parent.map.getCenter() 등을 사용하거나 메세지 패싱 필요
+            // 여기서는 테스트를 위해 기본값(서울 시청 근처) 사용하거나, 
+            // 만약 iframe으로 쓰인다면 부모에게 요청해야 함. 
+            // 일단은 하드코딩된 더미 값을 보내고, 통합 시 수정 필요.
+            // 하지만 요청사항은 "분리"이므로, 여기서 로직을 완결짓되, map 관련은 주석 처리 또는 예외 처리.
+
+            const currentLat = 37.5665;
+            const currentLng = 126.9780;
+
+            // 3. 로딩 표시 시작
+            showTyping(true);
+
+            // 4. 백엔드로 전송
+            try {
+                const response = await fetch("http://127.0.0.1:8000/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        current_lat: currentLat,
+                        current_lng: currentLng
+                    }),
+                });
+
+                if (!response.ok) throw new Error("Network response was not ok");
+
+                const data = await response.json();
+
+                // 5. 로딩 표시 숨김 및 봇 응답 추가
+                showTyping(false);
+                addMessage(data.reply, "bot");
+
+                // 6. 지도 조작 (부모 창으로 메시지 전달)
+                if (window.parent && window.parent.postMessage) {
+                    if (data.route_data) {
+                        window.parent.postMessage({ type: 'drawRoute', data: data.route_data }, '*');
+                    }
+                    if (data.move_to) {
+                        window.parent.postMessage({ type: 'moveTo', data: data.move_to }, '*');
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error:", error);
+                showTyping(false);
+                addMessage("오류가 발생했습니다. 다시 시도해주세요.", "bot");
+            }
+        }
+
+        function sendSuggestion(text) {
+            const inputField = document.getElementById("chat-input");
+            inputField.value = text;
+            sendMessage();
+        }
+
+        function showTyping(isLoading) {
+            const indicator = document.getElementById("typing-indicator");
+            const container = document.getElementById("chat-messages");
+
+            if (isLoading) {
+                indicator.style.display = "block";
+                container.appendChild(indicator);
+                container.scrollTop = container.scrollHeight;
+            } else {
+                indicator.style.display = "none";
+            }
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById("chat-messages");
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message", sender);
+            msgDiv.innerText = text;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
